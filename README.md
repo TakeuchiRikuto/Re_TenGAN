@@ -1,13 +1,17 @@
-# TenGAN
+# re_TenGAN
 
-A PyTorch implementation of "TenGAN: Pure Transformer Encoders Make an Efficient Discrete GAN for De Novo Molecular Generation."
-The paper has been accepted by [AISTATS 2024](https://). ![Overview of TenGAN](https://github.com/naruto7283/TenGAN/blob/main/tengan_overview.png)
+This repository is a fork of [TenGAN](https://github.com/naruto7283/TenGAN), a PyTorch implementation of  
+"TenGAN: Pure Transformer Encoders Make an Efficient Discrete GAN for De Novo Molecular Generation,"  
+accepted at [AISTATS 2024](https://).
+
+I am working on improving and extending TenGAN in this fork to enhance its performance and usability.
+
 
 ## Installation
 Execute the following commands:
 ```
-$ conda env create -n tengan_env -f env.yml
-$ source activate tengan_env
+$ conda env create -n re_tengan_env -f env/env_310.yml
+$ source activate re_tengan_env
 ```
 
 ## File Description
