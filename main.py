@@ -33,7 +33,7 @@ parser.add_argument('--batch_size', type=int, default=64, help='the batch size f
 
 # ===========================
 # Generator
-parser.add_argument('--gen_pretrain:', action='store_true', help='whether pretrain the dataset')
+parser.add_argument('--gen_pretrain', action='store_true', help='whether pretrain the dataset')
 parser.add_argument('--generated_num', type=int, default=10000, help='generate size of the negative file: 5000 for QM9, 10000 for ZINC')
 parser.add_argument('--gen_train_size', type=int, default=9600, help='the size of training data: 4800 for QM9, 9600 for ZINC')
 parser.add_argument('--gen_num_encoder_layers', type=int, default=4, help='the number of transformer encoder layers')
@@ -81,6 +81,7 @@ else:
     MODEL_NAME = 'TenGAN_' + str(args.dis_lambda)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu") # cuda:0,1,2,3
+
 GPUS = 1
 
 if args.dis_wgan:
@@ -297,9 +298,9 @@ def main():
         max_lr = args.gen_max_lr)
     gen_trainer = pytorch_lightning.Trainer(
         max_epochs = args.gen_epochs, 
-        gpus = GPUS, 
-        weights_summary=None,
-        progress_bar_refresh_rate = 5,
+        #gpus = GPUS, due to version
+        #weights_summary=None, due to version
+        #progress_bar_refresh_rate = 5,  due to version
         gradient_clip_val = 5.0,
         gradient_clip_algorithm = 'norm')
 
@@ -314,7 +315,7 @@ def main():
     else:
         # Load the pre-trained generator
         print("\n\nLoad Pre-trained Generator.")
-        gen.load_state_dict(torch.load(G_PRETRAINED_MODEL))
+        gen.load_state_dict(torch.load(G_PRETRAINED_MODEL, map_location=DEVICE))
     gen.to(DEVICE)
     # Sample the generated data
     print('Generating {} samples...'.format(args.generated_num))
@@ -340,8 +341,8 @@ def main():
         minibatch = args.dis_minibatch)
     dis_trainer = pytorch_lightning.Trainer(
         max_epochs = args.dis_epochs, 
-        gpus = GPUS, 
-        weights_summary=None,
+        #gpus = GPUS, due to version
+        #weights_summary=None, due to version
         gradient_clip_val = 1.0,
         gradient_clip_algorithm = 'value')
 
@@ -356,7 +357,7 @@ def main():
     else:
         # Load the pre-trained discirminator
         print("\n\nLoad Pre-trained Discriminator.")
-        dis.load_state_dict(torch.load(D_PRETRAINED_MODEL))
+        dis.load_state_dict(torch.load(D_PRETRAINED_MODEL, map_location=DEVICE))
     dis.to(DEVICE)
 
     # ===========================
@@ -379,9 +380,10 @@ def main():
     gen.requires_grad = True
     adv_trainer = pytorch_lightning.Trainer(
         max_epochs = D_STEP, 
-        gpus = GPUS, 
-        weights_summary=None,
-        progress_bar_refresh_rate=0)
+        #gpus = GPUS, 
+        #weights_summary=None,
+        #progress_bar_refresh_rate=0
+        )
     pg_optimizer = torch.optim.Adam(params = gen.parameters(), lr=args.adv_lr)
     rollout = Rollout(gen, roll_own_model, tokenizer, args.update_rate, DEVICE)
 
@@ -436,7 +438,7 @@ def main():
             return
         else:
             print("\n\nLoad TenGAN Generator: {}".format(TenGAN_G_MODEL))
-            gen.load_state_dict(torch.load(TenGAN_G_MODEL))
+            gen.load_state_dict(torch.load(TenGAN_G_MODEL, map_location=DEVICE))
             gen.to(DEVICE)
             print('\n\nGenerating {} samples...'.format(args.generated_num))  
             sampler = GenSampler(gen, gen_data_loader.tokenizer, args.batch_size, args.max_len)
@@ -449,7 +451,7 @@ def main():
                 return
             else:
                 print("Load TenGAN Discriminator: {}\n\n".format(TenGAN_D_MODEL))
-                dis.load_state_dict(torch.load(TenGAN_D_MODEL))
+                dis.load_state_dict(torch.load(TenGAN_D_MODEL, map_location=DEVICE))
                 dis.to(DEVICE)
 
     # Show Top-12 molecules

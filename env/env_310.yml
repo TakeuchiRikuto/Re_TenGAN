@@ -1,0 +1,31 @@
+name: py310env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - scipy
+  - pytorch
+  - torchvision
+  - rdkit
+  - jupyterlab
+  - pyqt  # GUI使うなら必要
+  - pip:
+    - pyspark
+    - pytorch-lightning
+    - tensorboard
+    - tqdm
+    - requests
+    - aiohttp
+    - yarl
+    - absl-py
+    - grpcio
+    - google-auth
+    - google-auth-oauthlib
+prefix: /home/cli/anaconda3/envs/py310env

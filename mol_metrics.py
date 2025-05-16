@@ -12,7 +12,8 @@ from copy import deepcopy
 from rdkit.Chem import QED
 from rdkit import DataStructs
 from rdkit.Chem import PandasTools, Crippen, Descriptors
-from rdkit.Chem.rdMolDescriptors import GetMorganFingerprintAsBitVect
+from rdkit.Chem.rdMolDescriptors import GetMorganFingerprintAsBitVect #旧バージョン
+from rdkit.Chem.rdFingerprintGenerator import GetMorganGenerator #新バージョン
 rdBase.DisableLog('rdApp.error')
 # ============================================================================
 # Build the vocabulary for SMILES. Besides, definite vectorize function (atoms -> numerics) and devectorize function (numerics -> atoms)
@@ -91,6 +92,7 @@ def reward_fn(properties, generated_smiles):
     return vals
 
 # Diversity
+#旧バージョンのためコメントアウト
 def batch_diversity(smiles):
     scores = []
     df = pd.DataFrame({'smiles': smiles})
@@ -285,7 +287,7 @@ def qed(mol):
     x[3] = Descriptors.NumHDonors(mol)          
     x[4] = Descriptors.TPSA(mol)
     x[5] = Descriptors.NumRotatableBonds(mol)
-    x[6] = Chem.GetSSSR(Chem.DeleteSubstructs(deepcopy(mol), AliphaticRings))
+    x[6] = len(Chem.GetSSSR(Chem.DeleteSubstructs(deepcopy(mol), AliphaticRings)))#lenで環の長さを取得
     for alert in StructuralAlerts:
         if (mol.HasSubstructMatch(alert)):
             x[7] += 1
