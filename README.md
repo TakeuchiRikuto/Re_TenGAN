@@ -1,4 +1,4 @@
-# re_TenGAN
+# Re_TenGAN
 
 This repository is a fork of [TenGAN](https://github.com/naruto7283/TenGAN), a PyTorch implementation of  
 "TenGAN: Pure Transformer Encoders Make an Efficient Discrete GAN for De Novo Molecular Generation,"  
