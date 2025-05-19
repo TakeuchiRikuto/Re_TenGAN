@@ -287,6 +287,7 @@ def main():
     # Generator objects definition
     gen_data_loader = GenDataLoader(POSITIVE_FILE, args.gen_train_size, args.batch_size)
     gen_data_loader.setup()
+    steps_per_epoch = len(gen_data_loader.train_dataloader())*2
     gen = GeneratorModel(
         n_tokens = gen_data_loader.tokenizer.n_tokens, 
         num_encoder_layers = args.gen_num_encoder_layers, 
@@ -295,7 +296,8 @@ def main():
         nhead = args.gen_num_heads, 
         dropout = args.gen_dropout,
         epochs = args.gen_epochs, 
-        max_lr = args.gen_max_lr)
+        max_lr = args.gen_max_lr,
+        steps_per_epoch=steps_per_epoch)
     gen_trainer = pytorch_lightning.Trainer(
         max_epochs = args.gen_epochs, 
         #gpus = GPUS, due to version
@@ -307,7 +309,7 @@ def main():
     # Pre-train the generator
     if args.gen_pretrain:
         print("\n\nPre-train Generator...")
-        gen_trainer.fit(gen, gen_data_loader)
+        gen_trainer.fit(gen, datamodule=gen_data_loader)
         # Pre-train time cost
         print('Generator Pre-train Time:\033[1;35m {:.2f}\033[0m hours'.format((time.time() - start_time) / 3600.))
         # Save the pre-trained generator model into file
@@ -338,7 +340,9 @@ def main():
         epochs = args.dis_epochs,
         pad_token = tokenizer.char_to_int[tokenizer.pad],
         dis_wgan = args.dis_wgan,
-        minibatch = args.dis_minibatch)
+        minibatch = args.dis_minibatch,
+        steps_per_epoch = len(dis_data_loader)
+    )
     dis_trainer = pytorch_lightning.Trainer(
         max_epochs = args.dis_epochs, 
         #gpus = GPUS, due to version

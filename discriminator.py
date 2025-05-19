@@ -24,6 +24,7 @@ class DiscriminatorModel(LightningModule):
         pad_token=0,
         dis_wgan=True,
         minibatch=True,
+        steps_per_epoch = None
     ):
         super().__init__()
         assert d_model % nhead == 0, "nheads must divide evenly into d_model" 
@@ -39,6 +40,7 @@ class DiscriminatorModel(LightningModule):
         self.dis_wgan = dis_wgan
         self.minibatch = minibatch
         self.setup_layers()
+        self.steps_per_epoch = steps_per_epoch
 
     # Initialize parameters with truncated normal distribution for the classifer 
     def truncated_normal_(self,tensor,mean=0,std=0.1):
@@ -71,7 +73,8 @@ class DiscriminatorModel(LightningModule):
             max_lr=self.max_lr, 
             total_steps=None, 
             epochs=self.epochs, 
-            steps_per_epoch=len(self.train_dataloader()),
+            #steps_per_epoch=len(self.train_dataloader()),
+            steps_per_epoch=self.steps_per_epoch,
             pct_start=6/self.epochs, 
             anneal_strategy='cos', 
             cycle_momentum=True, 

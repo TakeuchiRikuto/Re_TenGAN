@@ -49,6 +49,7 @@ class GeneratorModel(LightningModule):
         max_length = 1000,
         max_lr = 1e-3,
         epochs = 50,
+        steps_per_epoch=None
     ):
         super().__init__()
         self.n_tokens = n_tokens
@@ -62,6 +63,7 @@ class GeneratorModel(LightningModule):
         self.max_lr = max_lr
         self.epochs = epochs
         self.setup_layers()
+        self.steps_per_epoch = steps_per_epoch
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters())
@@ -70,7 +72,7 @@ class GeneratorModel(LightningModule):
             max_lr=self.max_lr, 
             total_steps=None, 
             epochs=self.epochs, 
-            steps_per_epoch=len(self.train_dataloader())*2,
+            steps_per_epoch=self.steps_per_epoch,
             pct_start=6/self.epochs, 
             anneal_strategy='cos', 
             cycle_momentum=True, 

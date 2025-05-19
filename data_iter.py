@@ -54,7 +54,7 @@ class GenDataLoader(LightningDataModule):
         tensors = torch.nn.utils.rnn.pad_sequence(tensors) # [maxlength, batch_size]
         return tensors
     
-    def setup(self):
+    def setup(self, stage=None):
         # Load data
         self.data = pd.read_csv(self.positive_file, nrows = self.val_size + self.train_size, names = ['smiles'])
         # Atom order randomize SMILES
@@ -73,11 +73,11 @@ class GenDataLoader(LightningDataModule):
     def train_dataloader(self):
         dataset = GenDataset(self.train_data, self.tokenizer)
         # pin_memory=True: speed the dataloading, num_workers: multithreading for dataloading
-        return DataLoader(dataset, batch_size=self.batch_size, pin_memory=True, collate_fn=self.custom_collate_and_pad, num_workers=40) 
+        return DataLoader(dataset, batch_size=self.batch_size, pin_memory=True, collate_fn=self.custom_collate_and_pad, num_workers=0) 
     
     def val_dataloader(self):
         dataset = GenDataset(self.val_data, self.tokenizer)
-        return DataLoader(dataset, batch_size=self.batch_size, pin_memory=True, collate_fn=self.custom_collate_and_pad, shuffle=False, num_workers=40)
+        return DataLoader(dataset, batch_size=self.batch_size, pin_memory=True, collate_fn=self.custom_collate_and_pad, shuffle=False, num_workers=0)
 
 
 # ============================================================================
@@ -120,7 +120,7 @@ class DisDataLoader(LightningDataModule):
         labels = torch.LongTensor(labels)
         return tensors, labels
     
-    def setup(self):
+    def setup(self, stage=None):
         # Load data
         self.positive_data = pd.read_csv(self.positive_file, names = ['smiles'])
         self.negative_data = pd.read_csv(self.negative_file, names = ['smiles'])
